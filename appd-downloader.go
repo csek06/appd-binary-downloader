@@ -34,6 +34,8 @@ var (
 	python    bool
 	goagent   bool
 	nodejs    bool
+	// authentication
+	userName  string
 )
 
 type Agent struct {
@@ -95,6 +97,9 @@ func main() {
 	flag.BoolVar(&goagent, "goagent", false, "Flag to Download Go Agent")
 	flag.BoolVar(&nodejs, "nodejs", false, "Flag to Download Node.js Agent")
 
+	//authentication components
+	flag.StringVar(&userName, "username", "", "AppDynamics Community  Username")
+
 	flag.Parse()
 
 	if all || allPlatform {
@@ -115,12 +120,19 @@ func main() {
 		nodejs = true
 	}
 
+	printUsername()
 	printCommandLineFlags()
 
 	downloadBinaries()
 
 	//test jvm sun download
 	//binaryDownload("agent.zip", "download-file/sun-jvm/20.4.0.29862/AppServerAgent-20.4.0.29862.zip")
+}
+
+func printUsername(){
+	if(len(userName) > 0){
+		fmt.Println("Downloading artifacts for [" + userName + "]")
+	}
 }
 
 func printCommandLineFlags() {
@@ -251,6 +263,7 @@ func binarySearch(ver, apm, oss, platOS, event, eum string) {
 	url := "https://download.appdynamics.com/download/downloadfile/?version=" +
 		ver + "&apm=" + apm + "&os=" + oss + "&platform_admin_os=" + platOS + "&appdynamics_cluster_os=&events=" +
 		event + "&eum=" + eum + "&apm_os=windows,linux,alpine-linux,solaris,solaris-sparc,aix"
+
 
 	var myClient = &http.Client{Timeout: 10 * time.Second}
 
