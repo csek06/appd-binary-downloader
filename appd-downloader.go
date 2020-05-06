@@ -98,7 +98,7 @@ func main() {
 	flag.BoolVar(&nodejs, "nodejs", false, "Flag to Download Node.js Agent")
 
 	//authentication components
-	flag.StringVar(&userName, "username", "", "AppD user name")
+	flag.StringVar(&userName, "username", "", "AppDynamics Community  Username")
 
 	flag.Parse()
 
