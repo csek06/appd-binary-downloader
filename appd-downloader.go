@@ -28,6 +28,8 @@ var (
 	python    bool
 	goagent   bool
 	nodejs    bool
+	// authentication
+	userName  string
 )
 
 func main() {
@@ -53,6 +55,9 @@ func main() {
 	flag.BoolVar(&goagent, "goagent", false, "Flag to Download Go Agent")
 	flag.BoolVar(&nodejs, "nodejs", false, "Flag to Download Node.js Agent")
 
+	//authentication components
+	flag.StringVar(&userName, "username", "", "AppD user name")
+
 	flag.Parse()
 
 	if all || allPlatform {
@@ -73,9 +78,16 @@ func main() {
 		nodejs = true
 	}
 
+	printUsername()
 	printCommandLineFlags()
 
 	downloadBinaries()
+}
+
+func printUsername(){
+	if(len(userName) > 0){
+		fmt.Println("Downloading artifacts for [" + userName + "]")
+	}
 }
 
 func printCommandLineFlags() {
@@ -201,6 +213,7 @@ func downloadBinaries() {
 		apm = ""
 	}
 }
+
 
 func binarySearch(ver, apm, os, platOS, event, eum string) {
 
