@@ -35,7 +35,9 @@ var (
 	goagent   bool
 	nodejs    bool
 	// authentication
-	userName string
+	userName          string
+	encryptedPassword string
+	decryptedPassword string
 )
 
 type Agent struct {
@@ -99,6 +101,8 @@ func main() {
 
 	//authentication components
 	flag.StringVar(&userName, "username", "", "AppDynamics Community  Username")
+	flag.StringVar(&encryptedPassword, "encrypted-password", "", "Your Encrypted Password created by this Program via -create-password='password'")
+	flag.StringVar(&decryptedPassword, "create-password", "", "Your AppDynamics Community Password to be Encrypted")
 
 	flag.Parse()
 
@@ -120,7 +124,15 @@ func main() {
 		nodejs = true
 	}
 
-	printUsername()
+	if len(encryptedPassword) > 0 {
+		decryptedPassword = passwordDecryptor(encryptedPassword)
+	} else if len(decryptedPassword) > 0 {
+		encryptedPassword = passwordCreator(decryptedPassword)
+		fmt.Println("Going forward you can pass your encrypted password via CLI as \n-encrypted-password='" + encryptedPassword + "'")
+	}
+	if len(userName) > 0 {
+		authenticateWithAppDynamics()
+	}
 	printCommandLineFlags()
 
 	downloadBinaries()
@@ -128,19 +140,12 @@ func main() {
 	//test jvm sun download
 	//binaryDownload("agent.zip", "download-file/sun-jvm/20.4.0.29862/AppServerAgent-20.4.0.29862.zip")
 
-	//test passwordCreator
-	password := "chris rocks!"
-	encrypted := passwordCreator(password)
-	fmt.Println("Super Secret: " + encrypted)
-	decrypted := passwordDecryptor(encrypted)
-	fmt.Println("Decrypted: " + decrypted)
-
 }
 
-func printUsername() {
-	if len(userName) > 0 {
-		fmt.Println("Downloading artifacts for [" + userName + "]")
-	}
+func authenticateWithAppDynamics() {
+	fmt.Println("Authenticating with AppDynamics for [" + userName + "] with password: '" + decryptedPassword + "'")
+
+	fmt.Println("Downloading artifacts as an authenticated user...")
 }
 
 func printCommandLineFlags() {
