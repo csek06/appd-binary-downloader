@@ -131,6 +131,9 @@ func main() {
 		fmt.Println("Going forward you can pass your encrypted password via CLI as \n-encrypted-password='" + encryptedPassword + "'")
 	}
 	if len(userName) > 0 {
+		if len(decryptedPassword) == 0 {
+			promptForPassword()
+		}
 		authenticateWithAppDynamics()
 	}
 	printCommandLineFlags()
@@ -140,6 +143,15 @@ func main() {
 	//test jvm sun download
 	//binaryDownload("agent.zip", "download-file/sun-jvm/20.4.0.29862/AppServerAgent-20.4.0.29862.zip")
 
+}
+
+func promptForPassword() {
+	fmt.Println("Password not passed into CLI, what is your AppDynamics Community Password?")
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+	decryptedPassword = strings.TrimSuffix(text, "\r\n")
+	encryptedPassword = passwordCreator(decryptedPassword)
+	fmt.Println("Going forward you can pass your encrypted password via CLI as \n-encrypted-password='" + encryptedPassword + "'")
 }
 
 func authenticateWithAppDynamics() {
