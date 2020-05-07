@@ -18,16 +18,21 @@ var (
 	eumserver         bool
 	synthetics        bool
 	// agent components
-	allAgent  bool
-	java      bool
-	db        bool
-	ma        bool
-	webserver bool
-	netviz    bool
-	php       bool
-	python    bool
-	goagent   bool
-	nodejs    bool
+	allAgent       bool
+	java           bool
+	dotnet         bool
+	sap            bool
+	iib            bool
+	clusterAgent   bool
+	analyticsAgent bool
+	db             bool
+	ma             bool
+	webserver      bool
+	netviz         bool
+	php            bool
+	python         bool
+	goagent        bool
+	nodejs         bool
 )
 
 func main() {
@@ -44,6 +49,11 @@ func main() {
 	// agent components
 	flag.BoolVar(&allAgent, "all-agent", false, "Flag to Download All Agent Binaries")
 	flag.BoolVar(&java, "java", false, "Flag to Download Java Agent")
+	flag.BoolVar(&dotnet, "dotnet", false, "Flag to Download .Net Agent")
+	flag.BoolVar(&sap, "sap", false, "Flag to Download SAP-ABAP Agent")
+	flag.BoolVar(&iib, "iib", false, "Flag to Download IIB Agent")
+	flag.BoolVar(&clusterAgent, "cluster-agent", false, "Flag to Download Cluster Agent")
+	flag.BoolVar(&analyticsAgent, "analytics-agent", false, "Flag to Download Analytics Agent")
 	flag.BoolVar(&db, "db", false, "Flag to Download DB Agent")
 	flag.BoolVar(&ma, "ma", false, "Flag to Download Machine Agent")
 	flag.BoolVar(&webserver, "webserver", false, "Flag to Download Web Server Agent")
@@ -63,6 +73,11 @@ func main() {
 	}
 	if all || allAgent {
 		java = true
+		dotnet = true
+		sap = true
+		iib = true
+		clusterAgent = true
+		analyticsAgent = true
 		db = true
 		ma = true
 		webserver = true
@@ -95,10 +110,25 @@ func printCommandLineFlags() {
 		}
 	}
 
-	if java || db || ma || webserver || netviz || php || python || goagent || nodejs {
+	if java || dotnet || sap || iib || clusterAgent || analyticsAgent || db || ma || webserver || netviz || php || python || goagent || nodejs {
 		fmt.Println("Following Agent Components will be Downloaded:")
 		if java {
 			fmt.Println("\tjava agent")
+		}
+		if sap {
+			fmt.Println("\tsap agent")
+		}
+		if dotnet {
+			fmt.Println("\t.NET agent")
+		}
+		if iib {
+			fmt.Println("\tIIB agent")
+		}
+		if clusterAgent {
+			fmt.Println("\tcluster agent")
+		}
+		if analyticsAgent {
+			fmt.Println("\tanalytics agent")
 		}
 		if db {
 			fmt.Println("\tdatabase agent")
@@ -157,6 +187,31 @@ func downloadBinaries() {
 	// agent components
 	if java {
 		apm = "jvm"
+		binarySearch(ver, apm, os, platOS, event, eum)
+		apm = ""
+	}
+	if dotnet {
+		apm = "dotnet%2Cdotnet-core"
+		binarySearch(ver, apm, os, platOS, event, eum)
+		apm = ""
+	}
+	if sap {
+		apm = "sap-agent"
+		binarySearch(ver, apm, os, platOS, event, eum)
+		apm = ""
+	}
+	if iib {
+		apm = "iib"
+		binarySearch(ver, apm, os, platOS, event, eum)
+		apm = ""
+	}
+	if clusterAgent {
+		apm = "cluster-agent"
+		binarySearch(ver, apm, os, platOS, event, eum)
+		apm = ""
+	}
+	if analyticsAgent {
+		apm = "analytics"
 		binarySearch(ver, apm, os, platOS, event, eum)
 		apm = ""
 	}
