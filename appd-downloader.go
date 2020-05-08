@@ -467,28 +467,6 @@ func binaryDownload(filename, uri string) {
 
 	fullURL := "https://download-files.appdynamics.com/" + uri
 
-	// 10 minute timeout on file download
-	var myClient = &http.Client{Timeout: 600 * time.Second}
+	FileDownload(filename, fullURL)
 
-	// get the data
-	resp, err := myClient.Get(fullURL)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Response Status:", resp.Status)
-	defer resp.Body.Close()
-
-	// create the file
-	out, err := os.Create(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer out.Close()
-
-	// write the body to file
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		panic(err)
-	}
 }
