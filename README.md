@@ -3,7 +3,7 @@
 ## how to compile
 
 ```bash
-go build appd-downloader.go
+go build
 ```
 
 ### how to compile for other operating systems
