@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/csek06/appd-binary-downloader/internal/pkg/privLib"
+	privlib "github.com/csek06/appd-binary-downloader/internal/pkg/privLib"
 )
 
 var (
@@ -43,7 +43,7 @@ var (
 	decryptedPassword string
 )
 
-type Agent struct {
+type agent struct {
 	ID                        int    `json:"id"`
 	Filename                  string `json:"filename"`
 	S3Path                    string `json:"s3_path"`
@@ -72,11 +72,11 @@ type Agent struct {
 	ReleaseNotesURL           string `json:"release_notes_url"`
 }
 
-type AgentSearch struct {
+type agentSearch struct {
 	Count    int     `json:"count"`
 	Next     string  `json:"next"`
 	Previous string  `json:"previous"`
-	Results  []Agent `json:"results"`
+	Results  []agent `json:"results"`
 }
 
 func main() {
@@ -138,9 +138,9 @@ func main() {
 	}
 
 	if len(encryptedPassword) > 0 {
-		decryptedPassword = privLib.PasswordDecryptor(encryptedPassword)
+		decryptedPassword = privlib.PasswordDecryptor(encryptedPassword)
 	} else if len(decryptedPassword) > 0 {
-		encryptedPassword = privLib.PasswordCreator(decryptedPassword)
+		encryptedPassword = privlib.PasswordCreator(decryptedPassword)
 		fmt.Println("Going forward you can pass your encrypted password via CLI as \n-encrypted-password='" + encryptedPassword + "'")
 	}
 	if len(userName) > 0 {
@@ -163,7 +163,7 @@ func promptForPassword() {
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')
 	decryptedPassword = strings.TrimSuffix(text, "\r\n")
-	encryptedPassword = privLib.PasswordCreator(decryptedPassword)
+	encryptedPassword = privlib.PasswordCreator(decryptedPassword)
 	fmt.Println("Going forward you can pass your encrypted password via CLI as \n-encrypted-password='" + encryptedPassword + "'")
 }
 
@@ -365,8 +365,8 @@ func binarySearch(ver, apm, oss, platOS, event, eum string) {
 	defer resp.Body.Close()
 
 	// parse JSON response to our AgentSearch Struct
-	var searchresults AgentSearch
-	privLib.ParseJSON(resp.Body, &searchresults)
+	var searchresults agentSearch
+	privlib.ParseJSON(resp.Body, &searchresults)
 
 	if searchresults.Count == 1 {
 		binaryDownload(searchresults.Results[0].Filename, searchresults.Results[0].S3Path)
@@ -402,6 +402,6 @@ func binaryDownload(filename, uri string) {
 
 	fullURL := "https://download-files.appdynamics.com/" + uri
 
-	privLib.FileDownload(filename, fullURL)
+	privlib.FileDownload(filename, fullURL)
 
 }

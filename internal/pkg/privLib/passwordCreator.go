@@ -1,4 +1,4 @@
-package privLib
+package privlib
 
 import (
 	"crypto/aes"
@@ -50,6 +50,10 @@ func generateKey() ([]byte, error) {
 	}
 	return key, nil
 }
+
+/*
+PasswordCreator will encrypt a new password giving a base64 version of the ciphertext:key
+*/
 func PasswordCreator(password string) string {
 	data := []byte(password)
 	key, err := generateKey()
@@ -70,6 +74,9 @@ func PasswordCreator(password string) string {
 	return secret64
 }
 
+/*
+PasswordDecryptor will accept a base64 string of ciphertext:key and decrypt to plain text
+*/
 func PasswordDecryptor(secret64 string) string {
 	//fmt.Println("Decrypting...")
 
