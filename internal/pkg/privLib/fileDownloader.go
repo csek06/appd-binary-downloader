@@ -1,4 +1,4 @@
-package privLib
+package privlib
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-const RefreshRate = time.Millisecond * 100
+const refreshRate = time.Millisecond * 100
 
 // WriteCounter counts the number of bytes written to it. It implements to the io.Writer
 // interface and we can pass this into io.TeeReader() which will report progress on each
@@ -21,6 +21,9 @@ type WriteCounter struct {
 	bar *pb.ProgressBar
 }
 
+/*
+FileDownload Given a filename and url, this method will attempt to download a file to a given named location
+*/
 func FileDownload(filename, url string) {
 
 	// Create the file, but give it a tmp file extension, this means we won't overwrite a
@@ -60,7 +63,7 @@ func FileDownload(filename, url string) {
 
 func newWriteCounter(total int) *WriteCounter {
 	b := pb.New(total)
-	b.SetRefreshRate(RefreshRate)
+	b.SetRefreshRate(refreshRate)
 	b.ShowTimeLeft = true
 	b.ShowSpeed = true
 	b.SetUnits(pb.U_BYTES)
@@ -76,10 +79,16 @@ func (wc *WriteCounter) Write(p []byte) (int, error) {
 	return wc.n, nil
 }
 
+/*
+Start starts the timer of writing the file
+*/
 func (wc *WriteCounter) Start() {
 	wc.bar.Start()
 }
 
+/*
+Finish finishes the timer of writing the file
+*/
 func (wc *WriteCounter) Finish() {
 	wc.bar.Finish()
 }

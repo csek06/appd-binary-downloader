@@ -1,4 +1,4 @@
-package privLib
+package privlib
 
 import (
 	"encoding/json"
@@ -9,6 +9,9 @@ import (
 	"strings"
 )
 
+/*
+ParseJSON will attempt to parse an io.Reader and place it on a passed interface{}
+*/
 func ParseJSON(jsonText io.Reader, thisStruct interface{}) {
 	// parse JSON response to our AgentSearch Struct
 	//var searchresults AgentSearch
