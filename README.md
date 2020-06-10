@@ -17,6 +17,12 @@
 
 ### Downloader Flags
 
+Example from below flags without having run this downloader previously. With the create-password flag, it will output an encrypted password that you can later use.
+
+```bash
+./appd-downloader_mac -username='user@appdynamics.com' -create-password
+```
+
 Authentication Flags
 
 - "username" "AppDynamics Community  Username")
