@@ -162,7 +162,7 @@ func promptForPassword() {
 	fmt.Println("Password not passed into CLI, what is your AppDynamics Community Password?")
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')
-	decryptedPassword = strings.TrimSuffix(text, "\r\n")
+	decryptedPassword = strings.TrimRight(text, "\r\n")
 	encryptedPassword = privlib.PasswordCreator(decryptedPassword)
 	fmt.Println("Going forward you can pass your encrypted password via CLI as \n-encrypted-password='" + encryptedPassword + "'")
 }
@@ -378,7 +378,7 @@ func binarySearch(ver, apm, oss, platOS, event, eum string) {
 		}
 		reader := bufio.NewReader(os.Stdin)
 		text, _ := reader.ReadString('\n')
-		text = strings.TrimSuffix(text, "\r\n")
+		text = strings.TrimRight(text, "\r\n")
 
 		if text == "" {
 			text = "0"
