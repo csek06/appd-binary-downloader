@@ -118,6 +118,11 @@ func main() {
 
 	flag.Parse()
 
+	if len(os.Args) == 1 {
+		fmt.Println(("No args given!"))
+		flag.PrintDefaults()
+	}
+
 	if all || allPlatform {
 		enterpriseconsole = true
 		eventsservice = true
