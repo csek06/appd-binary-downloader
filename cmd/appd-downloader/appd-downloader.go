@@ -42,6 +42,7 @@ var (
 	userName          string
 	encryptedPassword string
 	decryptedPassword string
+	createPassword    bool
 	appdToken         string
 )
 
@@ -111,8 +112,9 @@ func main() {
 
 	//authentication components
 	flag.StringVar(&userName, "username", "", "AppDynamics Community  Username")
-	flag.StringVar(&encryptedPassword, "encrypted-password", "", "Your Encrypted Password created by this Program via -create-password='password'")
-	flag.StringVar(&decryptedPassword, "create-password", "", "Your AppDynamics Community Password to be Encrypted")
+	flag.StringVar(&encryptedPassword, "encrypted-password", "", "Your Encrypted Password created by this Program via -create-password")
+	flag.StringVar(&decryptedPassword, "decrypted-password", "", "Your AppDynamics Community Password to be Encrypted")
+	flag.BoolVar(&createPassword, "create-password", false, "Flag to create an Encrypted Password to be used for this program")
 
 	flag.Parse()
 
@@ -144,6 +146,9 @@ func main() {
 	} else if len(decryptedPassword) > 0 {
 		encryptedPassword = privlib.PasswordCreator(decryptedPassword)
 		fmt.Println("Going forward you can pass your encrypted password via CLI as \n-encrypted-password='" + encryptedPassword + "'")
+	}
+	if createPassword {
+		promptForPassword()
 	}
 	if len(userName) > 0 {
 		if len(decryptedPassword) == 0 {
