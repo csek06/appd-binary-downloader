@@ -1,5 +1,54 @@
 # appd-binary-downloader
 
+## How to Use
+
+1. Download OS relevant binary from cmd/appd-binary-downloader/
+2. Ensure that the binary is executable (linux/unix cmd below)
+
+    ```bash
+    chmod +x appd-downloader*
+    ```
+
+3. Execute the binary with the proper commands which can be found via below command (additional help within Downloader Flags Section)
+
+    ```bash
+    ./appd-downloader* --help
+    ```
+
+### Downloader Flags
+
+Authentication Flags
+
+- "username" "AppDynamics Community  Username")
+- "encrypted-password" "Your Encrypted Password created by this Program via -create-password='password'")
+- "create-password" "Your AppDynamics Community Password to be Encrypted")
+
+Platform Components
+
+- "all-platform" "Flag to Download All Platform Components (EC, ES, EUM, Synthetics)"
+- "ec" "Flag to Download Enterprise Console"
+- "es" "Flag to Download Events Service"
+- "eum" "Flag to Download EUM Server"
+- "synthetics" "Flag to Download Synthetic Server"
+
+Agent Components
+
+- "all-agent" "Flag to Download All Agent Binaries"
+- "java" "Flag to Download Java Agent"
+- "dotnet" "Flag to Download .Net Agent"
+- "sap" "Flag to Download SAP-ABAP Agent"
+- "iib" "Flag to Download IIB Agent"
+- "cluster-agent" "Flag to Download Cluster Agent"
+- "analytics-agent" "Flag to Download Analytics Agent"
+- "db" "Flag to Download DB Agent"
+- "ma" "Flag to Download Machine Agent"
+- "webserver" "Flag to Download Web Server Agent"
+- "netviz" "Flag to Download NetViz Agent"
+- "php" "Flag to Download PHP Agent"
+- "python" "Flag to Download Python Agent"
+- "goagent" "Flag to Download Go Agent"
+- "nodejs" "Flag to Download Node.js Agent"
+
 ## how to run on mac (open app from an unidentified developer)
 
 1. In the Finder  on your Mac, locate the app you want to open.
