@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"net/http/cookiejar"
 	"os"
 	"regexp"
 	"strconv"
@@ -44,8 +43,6 @@ var (
 	encryptedPassword string
 	decryptedPassword string
 	appdToken         string
-	gCookies          []*http.Cookie
-	gCookieJar        *cookiejar.Jar
 )
 
 type agent struct {
