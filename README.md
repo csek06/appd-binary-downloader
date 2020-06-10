@@ -25,9 +25,10 @@ Example from below flags without having run this downloader previously. With the
 
 Authentication Flags
 
-- "username" "AppDynamics Community  Username")
-- "encrypted-password" "Your Encrypted Password created by this Program via -create-password='password'")
-- "create-password" "Your AppDynamics Community Password to be Encrypted")
+- "username" "AppDynamics Community  Username"
+- "encrypted-password" "Your Encrypted Password created by this Program via -create-password"
+- "decrypted-password" "Your AppDynamics Community Password to be Encrypted"
+- "create-password" "Flag to create an Encrypted Password to be used for this program"
 
 Platform Components
 
