@@ -24,7 +24,7 @@ type WriteCounter struct {
 /*
 FileDownload Given a filename and url, this method will attempt to download a file to a given named location
 */
-func FileDownload(filename, url string) {
+func FileDownload(filename, url, token string) {
 
 	// Create the file, but give it a tmp file extension, this means we won't overwrite a
 	// file until it's downloaded, but we'll remove the tmp extension once downloaded.
@@ -32,9 +32,24 @@ func FileDownload(filename, url string) {
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
+	resp, err := http.Get("http://google.com")
+	if len(token) == 0 {
+		resp, err = http.Get(url)
+	} else {
 
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			// handle err
+		}
+		req.Header.Set("Authorization", "Bearer "+token)
+
+		resp, err = http.DefaultClient.Do(req)
+		if err != nil {
+			// handle err
+		}
+	}
 	// Get the data
-	resp, err := http.Get(url)
+	//resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}

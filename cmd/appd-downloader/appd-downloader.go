@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -41,6 +42,7 @@ var (
 	userName          string
 	encryptedPassword string
 	decryptedPassword string
+	appdToken         string
 )
 
 type agent struct {
@@ -168,9 +170,47 @@ func promptForPassword() {
 }
 
 func authenticateWithAppDynamics() {
-	fmt.Println("Authenticating with AppDynamics for [" + userName + "] with password: '" + decryptedPassword + "'")
+	fmt.Println("Authenticating with AppDynamics for [ " + userName + " ] with password: [ " + decryptedPassword + " ]")
 
-	fmt.Println("Downloading artifacts as an authenticated user...")
+	url := "https://identity.msrv.saas.appdynamics.com/v2.0/oauth/token"
+
+	body := strings.NewReader(`{"username": "` + userName + `","password": "` + decryptedPassword + `","scopes": ["download"]}`)
+	req, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		// handle err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		// handle err
+	}
+
+	//fmt.Println("Response Status:", resp.Status)
+	scanner := bufio.NewScanner(resp.Body)
+	count := 0
+	reqbod := ""
+	for scanner.Scan() {
+		//fmt.Println(scanner.Text())
+		count++
+		reqbod += scanner.Text()
+	}
+
+	myRegex := `"access_token":\s"(?P<myToken>.*)",\s"`
+
+	r := regexp.MustCompile(myRegex)
+	validate := r.FindStringSubmatch(reqbod)
+	if len(validate) > 0 {
+		appdToken = validate[1]
+	} else {
+		fmt.Println("ERROR: Could not get token from AppDynamics!")
+	}
+
+	//fmt.Printf("Token:'%v'\n", appdToken)
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 }
 
 func printCommandLineFlags() {
@@ -349,7 +389,7 @@ func binarySearch(ver, apm, oss, platOS, event, eum string) {
 		panic(err)
 	}
 
-	fmt.Println("Response Status:", resp.Status)
+	//fmt.Println("Response Status:", resp.Status)
 
 	// print response body
 	/*
@@ -400,8 +440,13 @@ func binarySearch(ver, apm, oss, platOS, event, eum string) {
 
 func binaryDownload(filename, uri string) {
 
-	fullURL := "https://download-files.appdynamics.com/" + uri
+	fullURL := "https://download.appdynamics.com/download/prox/" + uri
 
-	privlib.FileDownload(filename, fullURL)
-
+	if len(userName) > 0 && len(decryptedPassword) > 0 {
+		privlib.FileDownload(filename, fullURL, appdToken)
+	} else {
+		// attempting unauthenticated download
+		fullURL = "https://download-files.appdynamics.com/" + uri
+		privlib.FileDownload(filename, fullURL, "")
+	}
 }
