@@ -47,7 +47,7 @@ You would then execute the below command to download a java agent, notice I am n
 ./appd-downloader_mac -auth='hCZJA4JA/zGRR79rEGig0eYNjty8c8r3D8LWTFqqPf/EjLR7baFzsAaqWQq1yQkvK99B7n6sFQM62I7TR6GRIgAnEl0LvZk5HRjBRSZWAwZ+Fdm2y+oNwr8=:kc7QBWZJMpTmcx7v2fNf9TyoKHTLKtv0gjYw511yjEozaGZBwM3+OjgAqgDhF4XkYehj38Rzd6IN8424Dpc/OiiNRMVdErWy' -java
 ```
 
-Authentication Flags
+#### Authentication Flags
 
 - "username" "AppDynamics Community  Username"
 - "encrypted-password" "Your Encrypted Password created by this Program via -create-password"
@@ -55,7 +55,7 @@ Authentication Flags
 - "create-password" "Flag to create an Encrypted Password to be used for this program"
 - "auth" "Flag that is combined from your Username and Encrypted Password to be used for this program"
 
-Platform Components
+#### Platform Components
 
 - "all-platform" "Flag to Download All Platform Components"
 - "ec" "Flag to Download Enterprise Console"
@@ -64,7 +64,7 @@ Platform Components
 - "synthetics" "Flag to Download Synthetic Server"
 - "cluster-manager" "Flag to Download Cluster Manager"
 
-Agent Components
+#### Agent Components
 
 - "all-agent" "Flag to Download All Agent Binaries"
 - "java" "Flag to Download Java Agent"
@@ -82,6 +82,12 @@ Agent Components
 - "goagent" "Flag to Download Go Agent"
 - "nodejs" "Flag to Download Node.js Agent"
 - "synthetic-agent" "Flag to download the Private Synthetic Agent"
+
+#### Automation Assistance Flags
+
+The below flags will assist with increased automation to reduce/remove any extra CLI input
+
+- "detect-host" "Flag to detect Host OS / Arch and reduce binary search results"
 
 ## how to run on mac (open app from an unidentified developer)
 
