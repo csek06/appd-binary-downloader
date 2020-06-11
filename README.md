@@ -17,10 +17,34 @@
 
 ### Downloader Flags
 
-Example from below flags without having run this downloader previously. With the create-password flag, it will output an encrypted password that you can later use.
+Example from below flags without having run this downloader previously. With the create-password flag, it will output an encrypted password and the 'auth' flag that you can later use.
+
+example credentials
+    - username: user@appdynamics.com
+    - password: password123
 
 ```bash
 ./appd-downloader_mac -username='user@appdynamics.com' -create-password
+password123
+```
+
+Above command output
+
+```bash
+./appd-downloader_mac -username='user@appdynamics.com' -create-password
+user: user@appdynamics.com pass:
+Password not passed into CLI, what is your AppDynamics Community Password?
+password123
+Going forward you can pass your encrypted password via CLI as
+-encrypted-password='kc7QBWZJMpTmcx7v2fNf9TyoKHTLKtv0gjYw511yjEozaGZBwM3+OjgAqgDhF4XkYehj38Rzd6IN8424Dpc/OiiNRMVdErWy'
+Going forward you can pass your encrypted credentials via CLI as
+-auth='hCZJA4JA/zGRR79rEGig0eYNjty8c8r3D8LWTFqqPf/EjLR7baFzsAaqWQq1yQkvK99B7n6sFQM62I7TR6GRIgAnEl0LvZk5HRjBRSZWAwZ+Fdm2y+oNwr8=:kc7QBWZJMpTmcx7v2fNf9TyoKHTLKtv0gjYw511yjEozaGZBwM3+OjgAqgDhF4XkYehj38Rzd6IN8424Dpc/OiiNRMVdErWy'
+```
+
+You would then execute the below command to download a java agent, notice I am not using '-encrypted-password' and only the '-auth' flag. If you use the '-encrypted-password' flag, you are required to also use the '-username' flag.
+
+```bash
+./appd-downloader_mac -auth='hCZJA4JA/zGRR79rEGig0eYNjty8c8r3D8LWTFqqPf/EjLR7baFzsAaqWQq1yQkvK99B7n6sFQM62I7TR6GRIgAnEl0LvZk5HRjBRSZWAwZ+Fdm2y+oNwr8=:kc7QBWZJMpTmcx7v2fNf9TyoKHTLKtv0gjYw511yjEozaGZBwM3+OjgAqgDhF4XkYehj38Rzd6IN8424Dpc/OiiNRMVdErWy' -java
 ```
 
 Authentication Flags
@@ -29,6 +53,7 @@ Authentication Flags
 - "encrypted-password" "Your Encrypted Password created by this Program via -create-password"
 - "decrypted-password" "Your AppDynamics Community Password to be Encrypted"
 - "create-password" "Flag to create an Encrypted Password to be used for this program"
+- "auth" "Flag that is combined from your Username and Encrypted Password to be used for this program"
 
 Platform Components
 

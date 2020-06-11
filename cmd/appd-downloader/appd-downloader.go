@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"encoding/base64"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -44,6 +46,7 @@ var (
 	decryptedPassword string
 	createPassword    bool
 	appdToken         string
+	auth              string
 )
 
 type agent struct {
@@ -111,10 +114,11 @@ func main() {
 	flag.BoolVar(&nodejs, "nodejs", false, "Flag to Download Node.js Agent")
 
 	//authentication components
-	flag.StringVar(&userName, "username", "", "AppDynamics Community  Username")
+	flag.StringVar(&userName, "username", "", "AppDynamics Community Username (email)")
 	flag.StringVar(&encryptedPassword, "encrypted-password", "", "Your Encrypted Password created by this Program via -create-password")
 	flag.StringVar(&decryptedPassword, "decrypted-password", "", "Your AppDynamics Community Password to be Encrypted")
 	flag.BoolVar(&createPassword, "create-password", false, "Flag to create an Encrypted Password to be used for this program")
+	flag.StringVar(&auth, "auth", "", "Flag that is combined from your Username and Encrypted Password to be used for this program")
 
 	flag.Parse()
 
@@ -146,28 +150,63 @@ func main() {
 		nodejs = true
 	}
 
+	if len(auth) > 0 {
+		decryptAuthFlag()
+	}
+
 	if len(encryptedPassword) > 0 {
 		decryptedPassword = privlib.PasswordDecryptor(encryptedPassword)
 	} else if len(decryptedPassword) > 0 {
 		encryptedPassword = privlib.PasswordCreator(decryptedPassword)
 		fmt.Println("Going forward you can pass your encrypted password via CLI as \n-encrypted-password='" + encryptedPassword + "'")
 	}
+	//fmt.Printf("user: %v pass: %v\n", userName, decryptedPassword)
 	if createPassword {
 		promptForPassword()
 	}
+	workToDo := anythingToDownload()
 	if len(userName) > 0 {
 		if len(decryptedPassword) == 0 {
 			promptForPassword()
 		}
-		authenticateWithAppDynamics()
+		if len(auth) == 0 {
+			createAuthFlag()
+		}
+		if workToDo {
+			authenticateWithAppDynamics()
+		}
 	}
 	printCommandLineFlags()
 
-	downloadBinaries()
+	if workToDo {
+		downloadBinaries()
+	}
 
 	//test jvm sun download
 	//binaryDownload("agent.zip", "download-file/sun-jvm/20.4.0.29862/AppServerAgent-20.4.0.29862.zip")
 
+}
+
+func decryptAuthFlag() {
+	vals := strings.Split(auth, ":")
+	if len(vals) > 0 {
+		userName = privlib.PasswordDecryptor(vals[0])
+		uName, err := base64.StdEncoding.DecodeString(userName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		userName = string(uName)
+		encryptedPassword = vals[1]
+	} else {
+		fmt.Println("ERROR: AUTH NOT VALID FORMAT")
+	}
+}
+
+func createAuthFlag() {
+	encryptedUserName := base64.StdEncoding.EncodeToString([]byte(userName))
+	encryptedUserName = privlib.PasswordCreator(encryptedUserName)
+	auth = encryptedUserName + ":" + encryptedPassword
+	fmt.Println("Going forward you can pass your encrypted credentials via CLI as \n-auth='" + auth + "'")
 }
 
 func promptForPassword() {
@@ -180,8 +219,8 @@ func promptForPassword() {
 }
 
 func authenticateWithAppDynamics() {
-	fmt.Println("Authenticating with AppDynamics for [ " + userName + " ] with password: [ " + decryptedPassword + " ]")
-
+	//fmt.Println("Authenticating with AppDynamics for [ " + userName + " ] with password: [ " + decryptedPassword + " ]")
+	fmt.Println("Fetching OAUTH Token from AppDynamics")
 	url := "https://identity.msrv.saas.appdynamics.com/v2.0/oauth/token"
 
 	body := strings.NewReader(`{"username": "` + userName + `","password": "` + decryptedPassword + `","scopes": ["download"]}`)
@@ -221,6 +260,16 @@ func authenticateWithAppDynamics() {
 		panic(err)
 	}
 	defer resp.Body.Close()
+}
+
+func anythingToDownload() bool {
+	if enterpriseconsole || eventsservice || eumserver || synthetics || java || dotnet || sap || iib || clusterAgent || analyticsAgent || db || ma || webserver || netviz || php || python || goagent || nodejs {
+		return true
+	}
+	fmt.Println("Nothing set to download via CLI")
+	flag.PrintDefaults()
+	return false
+
 }
 
 func printCommandLineFlags() {
