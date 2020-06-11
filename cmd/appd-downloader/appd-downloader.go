@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -49,6 +50,11 @@ var (
 	createPassword    bool
 	appdToken         string
 	auth              string
+	// automation assistance
+	detectHost bool
+	// host architecture
+	hostos   string
+	hostarch string
 )
 
 type agent struct {
@@ -117,19 +123,19 @@ func main() {
 	flag.BoolVar(&nodejs, "nodejs", false, "Flag to Download Node.js Agent")
 	flag.BoolVar(&syntheticAgent, "synthetic-agent", false, "Flag to download the Private Synthetic Agent")
 
-	//authentication components
+	// authentication components
 	flag.StringVar(&userName, "username", "", "AppDynamics Community Username (email)")
 	flag.StringVar(&encryptedPassword, "encrypted-password", "", "Your Encrypted Password created by this Program via -create-password")
 	flag.StringVar(&decryptedPassword, "decrypted-password", "", "Your AppDynamics Community Password to be Encrypted")
 	flag.BoolVar(&createPassword, "create-password", false, "Flag to create an Encrypted Password to be used for this program")
 	flag.StringVar(&auth, "auth", "", "Flag that is combined from your Username and Encrypted Password to be used for this program")
 
+	// automation assistance flags
+	flag.BoolVar(&detectHost, "detect-host", false, "Flag to detect Host OS / Arch and reduce binary search results")
+
 	flag.Parse()
 
-	if len(os.Args) == 1 {
-		fmt.Println(("No args given!"))
-		flag.PrintDefaults()
-	}
+	gatherHostDetails()
 
 	if all || allPlatform {
 		enterpriseconsole = true
@@ -191,6 +197,12 @@ func main() {
 	//test jvm sun download
 	//binaryDownload("agent.zip", "download-file/sun-jvm/20.4.0.29862/AppServerAgent-20.4.0.29862.zip")
 
+}
+
+func gatherHostDetails() {
+	hostos = runtime.GOOS
+	hostarch = runtime.GOARCH
+	fmt.Printf("Host Details\nOS: %s\nArch: %s\n", hostos, hostarch)
 }
 
 func decryptAuthFlag() {
@@ -353,19 +365,22 @@ func downloadBinaries() {
 
 	// platform components
 	if enterpriseconsole {
-		oss = "linux%2Cosx%2Cwindows"
-		platOS = "linux%2Cosx%2Cwindows"
+		search := detectPlatformBinary("linux%2Cosx%2Cwindows")
+		oss = search
+		platOS = search
 		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		oss = ""
 		platOS = ""
 	}
 	if eventsservice {
-		event = "linuxwindows"
+		search := detectPlatformBinary("linuxwindows")
+		event = search
 		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		event = ""
 	}
 	if eumserver {
-		eum = "linux%2Cwindows"
+		search := detectPlatformBinary("linux%2Cwindows")
+		eum = search
 		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		eum = ""
 	}
@@ -458,10 +473,45 @@ func downloadBinaries() {
 	}
 }
 
+func detectPlatformBinary(current string) string {
+	if detectHost {
+		switch hostos {
+		case "darwin":
+			if current == "linux%2Cosx%2Cwindows" {
+				current = "osx"
+			} else {
+				current = "linux"
+			}
+		case "windows":
+			current = "windows"
+		default:
+			current = "linux"
+		}
+	}
+	return current
+}
+
 func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
+	apmOS := "windows,linux,alpine-linux,solaris,solaris-sparc,aix"
+	if detectHost {
+		switch hostos {
+		case "windows":
+			apmOS = "windows"
+		case "linux":
+			apmOS = "linux"
+		case "darwin":
+			apmOS = "linux"
+		case "solaris":
+			apmOS = "solaris,solaris-sparc"
+		case "aix":
+			apmOS = "aix"
+		default:
+			apmOS = "linux"
+		}
+	}
 	url := "https://download.appdynamics.com/download/downloadfile/?version=" +
 		ver + "&apm=" + apm + "&os=" + oss + "&platform_admin_os=" + platOS + "&appdynamics_cluster_os=" + cm + "&events=" +
-		event + "&eum=" + eum + "&apm_os=windows,linux,alpine-linux,solaris,solaris-sparc,aix"
+		event + "&eum=" + eum + "&apm_os=" + apmOS
 
 	var myClient = &http.Client{Timeout: 10 * time.Second}
 
