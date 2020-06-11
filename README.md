@@ -57,11 +57,12 @@ Authentication Flags
 
 Platform Components
 
-- "all-platform" "Flag to Download All Platform Components (EC, ES, EUM, Synthetics)"
+- "all-platform" "Flag to Download All Platform Components"
 - "ec" "Flag to Download Enterprise Console"
 - "es" "Flag to Download Events Service"
 - "eum" "Flag to Download EUM Server"
 - "synthetics" "Flag to Download Synthetic Server"
+- "cluster-manager" "Flag to Download Cluster Manager"
 
 Agent Components
 
@@ -80,6 +81,7 @@ Agent Components
 - "python" "Flag to Download Python Agent"
 - "goagent" "Flag to Download Go Agent"
 - "nodejs" "Flag to Download Node.js Agent"
+- "synthetic-agent" "Flag to download the Private Synthetic Agent"
 
 ## how to run on mac (open app from an unidentified developer)
 

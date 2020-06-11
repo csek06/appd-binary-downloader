@@ -24,6 +24,7 @@ var (
 	eventsservice     bool
 	eumserver         bool
 	synthetics        bool
+	clusterManager    bool
 	// agent components
 	allAgent       bool
 	java           bool
@@ -40,6 +41,7 @@ var (
 	python         bool
 	goagent        bool
 	nodejs         bool
+	syntheticAgent bool
 	// authentication
 	userName          string
 	encryptedPassword string
@@ -90,11 +92,12 @@ func main() {
 	flag.BoolVar(&all, "all", false, "Flag to Download All Platform Components and All Agents")
 
 	// platform components
-	flag.BoolVar(&allPlatform, "all-platform", false, "Flag to Download All Platform Components (EC, ES, EUM, Synthetics)")
+	flag.BoolVar(&allPlatform, "all-platform", false, "Flag to Download All Platform Components")
 	flag.BoolVar(&enterpriseconsole, "ec", false, "Flag to Download Enterprise Console")
 	flag.BoolVar(&eventsservice, "es", false, "Flag to Download Events Service")
 	flag.BoolVar(&eumserver, "eum", false, "Flag to Download EUM Server")
 	flag.BoolVar(&synthetics, "synthetics", false, "Flag to Download Synthetic Server")
+	flag.BoolVar(&clusterManager, "cluster-manager", false, "Flag to Download Cluster Manager")
 
 	// agent components
 	flag.BoolVar(&allAgent, "all-agent", false, "Flag to Download All Agent Binaries")
@@ -112,6 +115,7 @@ func main() {
 	flag.BoolVar(&python, "python", false, "Flag to Download Python Agent")
 	flag.BoolVar(&goagent, "goagent", false, "Flag to Download Go Agent")
 	flag.BoolVar(&nodejs, "nodejs", false, "Flag to Download Node.js Agent")
+	flag.BoolVar(&syntheticAgent, "synthetic-agent", false, "Flag to download the Private Synthetic Agent")
 
 	//authentication components
 	flag.StringVar(&userName, "username", "", "AppDynamics Community Username (email)")
@@ -132,6 +136,7 @@ func main() {
 		eventsservice = true
 		eumserver = true
 		synthetics = true
+		clusterManager = true
 	}
 	if all || allAgent {
 		java = true
@@ -148,6 +153,7 @@ func main() {
 		python = true
 		goagent = true
 		nodejs = true
+		syntheticAgent = true
 	}
 
 	if len(auth) > 0 {
@@ -263,7 +269,7 @@ func authenticateWithAppDynamics() {
 }
 
 func anythingToDownload() bool {
-	if enterpriseconsole || eventsservice || eumserver || synthetics || java || dotnet || sap || iib || clusterAgent || analyticsAgent || db || ma || webserver || netviz || php || python || goagent || nodejs {
+	if enterpriseconsole || eventsservice || eumserver || synthetics || clusterManager || java || dotnet || sap || iib || clusterAgent || analyticsAgent || db || ma || webserver || netviz || php || python || goagent || nodejs || syntheticAgent {
 		return true
 	}
 	fmt.Println("Nothing set to download via CLI")
@@ -273,7 +279,7 @@ func anythingToDownload() bool {
 }
 
 func printCommandLineFlags() {
-	if enterpriseconsole || eventsservice || eumserver || synthetics {
+	if enterpriseconsole || eventsservice || eumserver || synthetics || clusterManager {
 		fmt.Println("Following Platform Components will be Downloaded:")
 		if enterpriseconsole {
 			fmt.Println("\tenterprise console")
@@ -287,9 +293,12 @@ func printCommandLineFlags() {
 		if synthetics {
 			fmt.Println("\tsynthetics server")
 		}
+		if clusterManager {
+			fmt.Println("\tcluster manager")
+		}
 	}
 
-	if java || dotnet || sap || iib || clusterAgent || analyticsAgent || db || ma || webserver || netviz || php || python || goagent || nodejs {
+	if java || dotnet || sap || iib || clusterAgent || analyticsAgent || db || ma || webserver || netviz || php || python || goagent || nodejs || syntheticAgent {
 		fmt.Println("Following Agent Components will be Downloaded:")
 		if java {
 			fmt.Println("\tjava agent")
@@ -333,112 +342,125 @@ func printCommandLineFlags() {
 		if nodejs {
 			fmt.Println("\tnode.js agent")
 		}
+		if syntheticAgent {
+			fmt.Println("\tprivate synthetic agent")
+		}
 	}
 }
 
 func downloadBinaries() {
-	var ver, apm, oss, platOS, event, eum string
+	var ver, apm, oss, platOS, cm, event, eum string
 
 	// platform components
 	if enterpriseconsole {
-		oss = "linux"
-		platOS = "linux"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		oss = "linux%2Cosx%2Cwindows"
+		platOS = "linux%2Cosx%2Cwindows"
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		oss = ""
 		platOS = ""
 	}
 	if eventsservice {
 		event = "linuxwindows"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		event = ""
 	}
 	if eumserver {
-		eum = "linux"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		eum = "linux%2Cwindows"
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		eum = ""
 	}
 	if synthetics {
 		eum = "synthetic-server"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		eum = ""
+	}
+	if clusterManager {
+		cm = "linux"
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
+		cm = ""
 	}
 
 	// agent components
 	if java {
-		apm = "jvm"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		apm = "jvm%2Cjava-agent-api%2Copentracer%2Cjava-jdk8"
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if dotnet {
 		apm = "dotnet%2Cdotnet-core"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if sap {
 		apm = "sap-agent"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if iib {
 		apm = "iib"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if clusterAgent {
 		apm = "cluster-agent"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if analyticsAgent {
 		apm = "analytics"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if db {
 		apm = "db"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if ma {
 		apm = "machine"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if webserver {
 		apm = "webserver"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if netviz {
 		apm = "netviz"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if php {
 		apm = "php"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if python {
 		apm = "python"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if goagent {
 		apm = "golang-sdk"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
 	}
 	if nodejs {
 		apm = "nodejs"
-		binarySearch(ver, apm, oss, platOS, event, eum)
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
 		apm = ""
+	}
+	if syntheticAgent {
+		eum = "synthetic"
+		binarySearch(ver, apm, oss, platOS, cm, event, eum)
+		eum = ""
 	}
 }
 
-func binarySearch(ver, apm, oss, platOS, event, eum string) {
+func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 	url := "https://download.appdynamics.com/download/downloadfile/?version=" +
-		ver + "&apm=" + apm + "&os=" + oss + "&platform_admin_os=" + platOS + "&appdynamics_cluster_os=&events=" +
+		ver + "&apm=" + apm + "&os=" + oss + "&platform_admin_os=" + platOS + "&appdynamics_cluster_os=" + cm + "&events=" +
 		event + "&eum=" + eum + "&apm_os=windows,linux,alpine-linux,solaris,solaris-sparc,aix"
 
 	var myClient = &http.Client{Timeout: 10 * time.Second}
@@ -473,7 +495,7 @@ func binarySearch(ver, apm, oss, platOS, event, eum string) {
 		fmt.Println("Which binary to download?")
 		// print results of decoded json high level info
 		for i, binaries := range searchresults.Results {
-			fmt.Printf("%d: id: %d version:%s title:%s\n", i, binaries.ID, binaries.Version, binaries.Title)
+			fmt.Printf("%d: id: %d version:%s title:%s (%s)\n", i, binaries.ID, binaries.Version, binaries.Title, binaries.CreationTime)
 		}
 		reader := bufio.NewReader(os.Stdin)
 		text, _ := reader.ReadString('\n')
