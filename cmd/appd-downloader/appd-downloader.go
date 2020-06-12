@@ -609,7 +609,9 @@ func detectHostReduceResults(thisStruct *agentSearch) {
 			binaries = append(binaries, thisStruct.Results[i])
 		}
 	}
-	thisStruct.Results = binaries
+	if len(binaries) > 0 {
+		thisStruct.Results = binaries
+	}
 }
 
 func automateReduceResults(thisStruct *agentSearch) {
