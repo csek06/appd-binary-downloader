@@ -675,7 +675,7 @@ func binaryDownload(filename, uri string) {
 	fullURL := "https://download.appdynamics.com/download/prox/" + uri
 
 	if len(userName) > 0 && len(decryptedPassword) > 0 {
-		privlib.FileDownload(filename, fullURL, appdToken)
+		privlib.FileDownload(outputFolder+filename, fullURL, appdToken)
 	} else {
 		// attempting unauthenticated download
 		fullURL = "https://download-files.appdynamics.com/" + uri
