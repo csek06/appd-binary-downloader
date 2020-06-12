@@ -19,10 +19,10 @@
 
 #### Download without Authentication
 
-Currently there exists a method to donwload the agents without authentication, this program will attempt to do this. Below is an example command that you would ues to download the database, java, and machine agents all in one go. You will notice I am also using the '-automate' flag that will take some assumptions on what you're searching for by detecting the host environment.
+Currently there exists a method to donwload the agents without authentication, this program will attempt to do this. Below is an example command that you would ues to download the database, java, and machine agents all in one go. You will notice I am also using the '-automate' flag that will take some assumptions on what you're searching for by detecting the host environment. Additionally there is the '-o' flag (optional) will place the binaries in the targeted output folder.
 
 ```bash
-./appd-downloader_mac -automate -db -java -ma
+./appd-downloader_mac -automate -db -java -ma -o='agent-folder'
 ```
 
 Above command output
