@@ -642,6 +642,13 @@ func automateReduceResults(thisStruct *agentSearch) {
 		if thisStruct.Results[i].Extension == "rpm" {
 			binaries = append(binaries, thisStruct.Results[i])
 		}
+	}
+	if len(binaries) > 0 {
+		thisStruct.Results = binaries
+	}
+
+	binaries = []agent{}
+	for i := 0; i < len(thisStruct.Results); i++ {
 		// only show appropriate java binaries
 		if hostos == "linux" || hostos == "darwin" && strings.Contains(thisStruct.Results[i].Title, "Sun and JRockit JVM") {
 			binaries = append(binaries, thisStruct.Results[i])
