@@ -89,6 +89,7 @@ The below flags will assist with increased automation to reduce/remove any extra
 
 - "detect-host" "Flag to detect Host OS / Arch and reduce binary search results"
 - "direct-binary" "Flag to download a binary directly via link produced from previous output"
+- "automate" "Flag to make assumptions based upon best practice installations (e.g. only show RPM if available)"
 
 ## how to run on mac (open app from an unidentified developer)
 

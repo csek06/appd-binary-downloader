@@ -53,6 +53,7 @@ var (
 	// automation assistance
 	detectHost   bool
 	directBinary string
+	automate     bool
 	// host architecture
 	hostos   string
 	hostarch string
@@ -134,8 +135,13 @@ func main() {
 	// automation assistance flags
 	flag.BoolVar(&detectHost, "detect-host", false, "Flag to detect Host OS / Arch and reduce binary search results")
 	flag.StringVar(&directBinary, "direct-binary", "", "Flag to download a binary directly via link produced from previous output")
+	flag.BoolVar(&automate, "automate", false, "Flag to make assumptions based upon best practice installations (e.g. only show RPM if available)")
 
 	flag.Parse()
+
+	if automate {
+		detectHost = true
+	}
 
 	if detectHost {
 		gatherHostDetails()
@@ -553,9 +559,16 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 	var searchresults agentSearch
 	privlib.ParseJSON(resp.Body, &searchresults)
 
-	if searchresults.Count == 1 {
+	if detectHost {
+		detectHostReduceResults(&searchresults)
+	}
+	if automate {
+		automateReduceResults(&searchresults)
+	}
+
+	if len(searchresults.Results) == 1 {
 		binaryDownload(searchresults.Results[0].Filename, searchresults.Results[0].S3Path)
-	} else if searchresults.Count > 1 {
+	} else if len(searchresults.Results) > 1 {
 		fmt.Println("Which binary to download?")
 		// print results of decoded json high level info
 		for i, binaries := range searchresults.Results {
@@ -582,6 +595,34 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 		fmt.Println("No results found within search")
 	}
 
+}
+
+func detectHostReduceResults(thisStruct *agentSearch) {
+	bit := "32"
+	if strings.Contains(hostarch, "64") {
+		bit = "64"
+	}
+	max := len(thisStruct.Results)
+	binaries := []agent{}
+	for i := 0; i < max; i++ {
+		if thisStruct.Results[i].Bit == bit || thisStruct.Results[i].Bit == "null" {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+	}
+	thisStruct.Results = binaries
+}
+
+func automateReduceResults(thisStruct *agentSearch) {
+	max := len(thisStruct.Results)
+	binaries := []agent{}
+	for i := 0; i < max; i++ {
+		if thisStruct.Results[i].Extension == "rpm" {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+	}
+	if len(binaries) > 0 {
+		thisStruct.Results = binaries
+	}
 }
 
 func binaryDownload(filename, uri string) {
