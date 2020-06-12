@@ -116,6 +116,10 @@ The below flags will assist with increased automation to reduce/remove any extra
 - "direct-binary" "Flag to download a binary directly via link produced from previous output"
 - "automate" "Flag to make assumptions based upon best practice installations (e.g. only show RPM if available)"
 
+#### Other Helpful Flags
+
+- "o" "Flag to set the output folder of binaries, default is current directory"
+
 ## how to run on mac (open app from an unidentified developer)
 
 1. In the Finder  on your Mac, locate the app you want to open.

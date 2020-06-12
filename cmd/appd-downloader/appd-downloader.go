@@ -57,6 +57,8 @@ var (
 	// host architecture
 	hostos   string
 	hostarch string
+	// other flags
+	outputFolder string
 )
 
 type agent struct {
@@ -136,6 +138,9 @@ func main() {
 	flag.BoolVar(&detectHost, "detect-host", false, "Flag to detect Host OS / Arch and reduce binary search results")
 	flag.StringVar(&directBinary, "direct-binary", "", "Flag to download a binary directly via link produced from previous output")
 	flag.BoolVar(&automate, "automate", false, "Flag to make assumptions based upon best practice installations (e.g. only show RPM if available)")
+
+	// other flags
+	flag.StringVar(&outputFolder, "o", "", "Flag to set the output folder of binaries, default is current directory")
 
 	flag.Parse()
 
@@ -663,6 +668,10 @@ func automateReduceResults(thisStruct *agentSearch) {
 
 func binaryDownload(filename, uri string) {
 
+	if len(outputFolder) > 0 {
+		outputFolder = privlib.CheckCreateFolder(outputFolder)
+	}
+
 	fullURL := "https://download.appdynamics.com/download/prox/" + uri
 
 	if len(userName) > 0 && len(decryptedPassword) > 0 {
@@ -670,6 +679,6 @@ func binaryDownload(filename, uri string) {
 	} else {
 		// attempting unauthenticated download
 		fullURL = "https://download-files.appdynamics.com/" + uri
-		privlib.FileDownload(filename, fullURL, "")
+		privlib.FileDownload(outputFolder+filename, fullURL, "")
 	}
 }

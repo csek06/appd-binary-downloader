@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -19,6 +20,15 @@ const refreshRate = time.Millisecond * 100
 type WriteCounter struct {
 	n   int // bytes read so far
 	bar *pb.ProgressBar
+}
+
+/*
+CheckCreateFolder Given a destination automatically create a folder if it doesn't exist and return path of that folder
+*/
+func CheckCreateFolder(outputFolder string) string {
+	os.MkdirAll(outputFolder, os.ModePerm)
+	abs, _ := filepath.Abs(outputFolder)
+	return abs + string(os.PathSeparator)
 }
 
 /*
