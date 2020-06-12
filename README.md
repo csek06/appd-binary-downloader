@@ -17,6 +17,31 @@
 
 ### Downloader Flags
 
+#### Download without Authentication
+
+Currently there exists a method to donwload the agents without authentication, this program will attempt to do this. Below is an example command that you would ues to download the database, java, and machine agents all in one go. You will notice I am also using the '-automate' flag that will take some assumptions on what you're searching for by detecting the host environment.
+
+```bash
+./appd-downloader_mac -automate -db -java -ma
+```
+
+Above command output
+
+```bash
+Host Details
+OS: darwin
+Arch: amd64
+Following Agent Components will be Downloaded:
+        java agent
+        database agent
+        machine agent
+ 20.59 MiB / 20.59 MiB [=================================================================================================================] 100.00% 51.10 MiB/s 0s
+ 147.84 MiB / 147.84 MiB [===============================================================================================================] 100.00% 29.96 MiB/s 4s
+ 130.51 MiB / 130.51 MiB [===============================================================================================================] 100.00% 43.18 MiB/s 3s
+ ```
+
+#### Download via Authentication
+
 Example from below flags without having run this downloader previously. With the create-password flag, it will output an encrypted password and the 'auth' flag that you can later use.
 
 example credentials
