@@ -51,7 +51,8 @@ var (
 	appdToken         string
 	auth              string
 	// automation assistance
-	detectHost bool
+	detectHost   bool
+	directBinary string
 	// host architecture
 	hostos   string
 	hostarch string
@@ -132,10 +133,13 @@ func main() {
 
 	// automation assistance flags
 	flag.BoolVar(&detectHost, "detect-host", false, "Flag to detect Host OS / Arch and reduce binary search results")
+	flag.StringVar(&directBinary, "direct-binary", "", "Flag to download a binary directly via link produced from previous output")
 
 	flag.Parse()
 
-	gatherHostDetails()
+	if detectHost {
+		gatherHostDetails()
+	}
 
 	if all || allPlatform {
 		enterpriseconsole = true
@@ -192,6 +196,13 @@ func main() {
 
 	if workToDo {
 		downloadBinaries()
+	}
+
+	if len(directBinary) > 0 {
+		splits := strings.Split(directBinary, "/")
+		filename := splits[len(splits)-1]
+		fmt.Println("Downloading: " + filename)
+		binaryDownload(filename, directBinary)
 	}
 
 	//test jvm sun download
@@ -282,6 +293,9 @@ func authenticateWithAppDynamics() {
 
 func anythingToDownload() bool {
 	if enterpriseconsole || eventsservice || eumserver || synthetics || clusterManager || java || dotnet || sap || iib || clusterAgent || analyticsAgent || db || ma || webserver || netviz || php || python || goagent || nodejs || syntheticAgent {
+		return true
+	}
+	if len(directBinary) > 0 {
 		return true
 	}
 	fmt.Println("Nothing set to download via CLI")
@@ -561,6 +575,7 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 		}
 		if textint >= 0 && textint < searchresults.Count {
 			fmt.Printf("Downloading: %d id:%d...\n", textint, searchresults.Results[textint].ID)
+			fmt.Printf("Direct Link for Future Use:\n-direct-binary='%s'\n", searchresults.Results[textint].S3Path)
 			binaryDownload(searchresults.Results[textint].Filename, searchresults.Results[textint].S3Path)
 		}
 	} else {

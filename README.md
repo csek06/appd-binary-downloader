@@ -88,6 +88,7 @@ You would then execute the below command to download a java agent, notice I am n
 The below flags will assist with increased automation to reduce/remove any extra CLI input
 
 - "detect-host" "Flag to detect Host OS / Arch and reduce binary search results"
+- "direct-binary" "Flag to download a binary directly via link produced from previous output"
 
 ## how to run on mac (open app from an unidentified developer)
 
