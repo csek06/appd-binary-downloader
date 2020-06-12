@@ -559,9 +559,12 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 	var searchresults agentSearch
 	privlib.ParseJSON(resp.Body, &searchresults)
 
+	// reduce results if detecting hosts
 	if detectHost {
 		detectHostReduceResults(&searchresults)
 	}
+
+	// reduce results if automating
 	if automate {
 		automateReduceResults(&searchresults)
 	}
@@ -602,9 +605,8 @@ func detectHostReduceResults(thisStruct *agentSearch) {
 	if strings.Contains(hostarch, "64") {
 		bit = "64"
 	}
-	max := len(thisStruct.Results)
 	binaries := []agent{}
-	for i := 0; i < max; i++ {
+	for i := 0; i < len(thisStruct.Results); i++ {
 		if thisStruct.Results[i].Bit == bit || thisStruct.Results[i].Bit == "null" {
 			binaries = append(binaries, thisStruct.Results[i])
 		}
@@ -615,10 +617,35 @@ func detectHostReduceResults(thisStruct *agentSearch) {
 }
 
 func automateReduceResults(thisStruct *agentSearch) {
-	max := len(thisStruct.Results)
+	newbinaries := []agent{}
+	for i := 0; i < len(thisStruct.Results); i++ {
+		// only show new binaries (within 6 months)!
+		sixMonths := time.Now().AddDate(0, -6, 0)
+		binarydate := thisStruct.Results[i].CreationTime
+		layout := "2006-01-02T15:04:05.000000Z"
+		parsedate, err := time.Parse(layout, binarydate)
+		if err != nil {
+			fmt.Println(err)
+		}
+		if parsedate.After(sixMonths) {
+			newbinaries = append(newbinaries, thisStruct.Results[i])
+		}
+	}
+	// if there were binaries within 6 months change results to this reduced list
+	if len(newbinaries) > 0 {
+		thisStruct.Results = newbinaries
+	}
+
 	binaries := []agent{}
-	for i := 0; i < max; i++ {
+	for i := 0; i < len(thisStruct.Results); i++ {
+		// only show rpm if found
 		if thisStruct.Results[i].Extension == "rpm" {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+		// only show appropriate java binaries
+		if hostos == "linux" || hostos == "darwin" && strings.Contains(thisStruct.Results[i].Title, "Sun and JRockit JVM") {
+			binaries = append(binaries, thisStruct.Results[i])
+		} else if hostos == "aix" && strings.Contains(thisStruct.Results[i].Title, "IBM JVM") {
 			binaries = append(binaries, thisStruct.Results[i])
 		}
 	}
