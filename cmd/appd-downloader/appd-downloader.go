@@ -53,6 +53,7 @@ var (
 	// automation assistance
 	detectHost   bool
 	directBinary string
+	automate     bool
 	// host architecture
 	hostos   string
 	hostarch string
@@ -134,8 +135,13 @@ func main() {
 	// automation assistance flags
 	flag.BoolVar(&detectHost, "detect-host", false, "Flag to detect Host OS / Arch and reduce binary search results")
 	flag.StringVar(&directBinary, "direct-binary", "", "Flag to download a binary directly via link produced from previous output")
+	flag.BoolVar(&automate, "automate", false, "Flag to make assumptions based upon best practice installations (e.g. only show RPM if available)")
 
 	flag.Parse()
+
+	if automate {
+		detectHost = true
+	}
 
 	if detectHost {
 		gatherHostDetails()
@@ -553,9 +559,19 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 	var searchresults agentSearch
 	privlib.ParseJSON(resp.Body, &searchresults)
 
-	if searchresults.Count == 1 {
+	// reduce results if detecting hosts
+	if detectHost {
+		detectHostReduceResults(&searchresults)
+	}
+
+	// reduce results if automating
+	if automate {
+		automateReduceResults(&searchresults)
+	}
+
+	if len(searchresults.Results) == 1 {
 		binaryDownload(searchresults.Results[0].Filename, searchresults.Results[0].S3Path)
-	} else if searchresults.Count > 1 {
+	} else if len(searchresults.Results) > 1 {
 		fmt.Println("Which binary to download?")
 		// print results of decoded json high level info
 		for i, binaries := range searchresults.Results {
@@ -582,6 +598,60 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 		fmt.Println("No results found within search")
 	}
 
+}
+
+func detectHostReduceResults(thisStruct *agentSearch) {
+	bit := "32"
+	if strings.Contains(hostarch, "64") {
+		bit = "64"
+	}
+	binaries := []agent{}
+	for i := 0; i < len(thisStruct.Results); i++ {
+		if thisStruct.Results[i].Bit == bit || thisStruct.Results[i].Bit == "null" {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+	}
+	if len(binaries) > 0 {
+		thisStruct.Results = binaries
+	}
+}
+
+func automateReduceResults(thisStruct *agentSearch) {
+	newbinaries := []agent{}
+	for i := 0; i < len(thisStruct.Results); i++ {
+		// only show new binaries (within 6 months)!
+		sixMonths := time.Now().AddDate(0, -6, 0)
+		binarydate := thisStruct.Results[i].CreationTime
+		layout := "2006-01-02T15:04:05.000000Z"
+		parsedate, err := time.Parse(layout, binarydate)
+		if err != nil {
+			fmt.Println(err)
+		}
+		if parsedate.After(sixMonths) {
+			newbinaries = append(newbinaries, thisStruct.Results[i])
+		}
+	}
+	// if there were binaries within 6 months change results to this reduced list
+	if len(newbinaries) > 0 {
+		thisStruct.Results = newbinaries
+	}
+
+	binaries := []agent{}
+	for i := 0; i < len(thisStruct.Results); i++ {
+		// only show rpm if found
+		if thisStruct.Results[i].Extension == "rpm" {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+		// only show appropriate java binaries
+		if hostos == "linux" || hostos == "darwin" && strings.Contains(thisStruct.Results[i].Title, "Sun and JRockit JVM") {
+			binaries = append(binaries, thisStruct.Results[i])
+		} else if hostos == "aix" && strings.Contains(thisStruct.Results[i].Title, "IBM JVM") {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+	}
+	if len(binaries) > 0 {
+		thisStruct.Results = binaries
+	}
 }
 
 func binaryDownload(filename, uri string) {
