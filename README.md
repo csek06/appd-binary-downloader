@@ -1,5 +1,13 @@
 # appd-binary-downloader
 
+## Safe Harbor
+
+This is a community developed program and is not supported by AppDynamics Support. If you run into any issues, please create an issue here and it will be addressed accordingly.
+
+## What this Does
+
+This program allows a user to download the latest product binaries from a command line approach. It has been developed with various automation use cases in mind to reduce any additional required input from the end user. We are still in an early phase of this project and have not vetted out every possible use case. If you run into a use case you desire, please submit a new issue.
+
 ## How to Use
 
 1. Download OS relevant binary from cmd/appd-binary-downloader/
