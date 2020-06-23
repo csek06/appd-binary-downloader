@@ -55,8 +55,11 @@ var (
 	directBinary string
 	automate     bool
 	// host architecture
-	hostos   string
-	hostarch string
+	hostos    string
+	hostarch  string
+	targetos  string
+	targetbit string
+	extension string
 	// other flags
 	outputFolder string
 )
@@ -138,6 +141,9 @@ func main() {
 	flag.BoolVar(&detectHost, "detect-host", false, "Flag to detect Host OS / Arch and reduce binary search results")
 	flag.StringVar(&directBinary, "direct-binary", "", "Flag to download a binary directly via link produced from previous output")
 	flag.BoolVar(&automate, "automate", false, "Flag to make assumptions based upon best practice installations (e.g. only show RPM if available)")
+	flag.StringVar(&targetos, "tos", "", "Flag to set the target OS binary type (e.g. -tos=linux)")
+	flag.StringVar(&targetbit, "tbit", "", "Flag to set the target OS Bit binary type (e.g. -tbit=32)")
+	flag.StringVar(&extension, "extension", "", "Flag to set file extension zip or rpm or other applicable")
 
 	// other flags
 	flag.StringVar(&outputFolder, "o", "", "Flag to set the output folder of binaries, default is current directory")
@@ -564,9 +570,24 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 	var searchresults agentSearch
 	privlib.ParseJSON(resp.Body, &searchresults)
 
+	// reduce results if extension set
+	if len(extension) > 0 {
+		extensionReduceResults(&searchresults)
+	}
+
 	// reduce results if detecting hosts
 	if detectHost {
 		detectHostReduceResults(&searchresults)
+	}
+
+	// reduce results if targetting OS
+	if len(targetos) > 0 {
+		targetOSReduceResults(&searchresults)
+	}
+
+	// reduce results if targetting OS Bit
+	if len(targetbit) > 0 {
+		targetBitReduceResults(&searchresults)
 	}
 
 	// reduce results if automating
@@ -580,7 +601,7 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 		fmt.Println("Which binary to download?")
 		// print results of decoded json high level info
 		for i, binaries := range searchresults.Results {
-			fmt.Printf("%d: id: %d version:%s title:%s (%s)\n", i, binaries.ID, binaries.Version, binaries.Title, binaries.CreationTime)
+			fmt.Printf("%d: id: %d version: %s title: %s (%s)\n", i, binaries.ID, binaries.Version, binaries.Title, binaries.CreationTime)
 		}
 		reader := bufio.NewReader(os.Stdin)
 		text, _ := reader.ReadString('\n')
@@ -605,6 +626,18 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 
 }
 
+func extensionReduceResults(thisStruct *agentSearch) {
+	binaries := []agent{}
+	for i := 0; i < len(thisStruct.Results); i++ {
+		if thisStruct.Results[i].Extension == extension {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+	}
+	if len(binaries) > 0 {
+		thisStruct.Results = binaries
+	}
+}
+
 func detectHostReduceResults(thisStruct *agentSearch) {
 	bit := "32"
 	if strings.Contains(hostarch, "64") {
@@ -613,6 +646,30 @@ func detectHostReduceResults(thisStruct *agentSearch) {
 	binaries := []agent{}
 	for i := 0; i < len(thisStruct.Results); i++ {
 		if thisStruct.Results[i].Bit == bit || thisStruct.Results[i].Bit == "null" {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+	}
+	if len(binaries) > 0 {
+		thisStruct.Results = binaries
+	}
+}
+
+func targetOSReduceResults(thisStruct *agentSearch) {
+	binaries := []agent{}
+	for i := 0; i < len(thisStruct.Results); i++ {
+		if thisStruct.Results[i].Os == targetos {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+	}
+	if len(binaries) > 0 {
+		thisStruct.Results = binaries
+	}
+}
+
+func targetBitReduceResults(thisStruct *agentSearch) {
+	binaries := []agent{}
+	for i := 0; i < len(thisStruct.Results); i++ {
+		if thisStruct.Results[i].Bit == targetbit || thisStruct.Results[i].Bit == "null" {
 			binaries = append(binaries, thisStruct.Results[i])
 		}
 	}
