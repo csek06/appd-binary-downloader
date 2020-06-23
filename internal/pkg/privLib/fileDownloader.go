@@ -28,14 +28,21 @@ type WriteCounter struct {
 CheckCreateFolder Given a destination automatically create a folder if it doesn't exist and return path of that folder
 */
 func CheckCreateFolder(outputFolder string) string {
+	home, err := homedir.Dir()
+	if err != nil {
+		// handle err
+	}
+	homesplit := strings.Split(home, "/")
+	endhome := ""
+	if len(homesplit) > 0 {
+		endhome = homesplit[len(homesplit)-1]
+	}
 	if strings.HasPrefix(outputFolder, "~/") {
-
-		home, err := homedir.Dir()
-		if err != nil {
-			// handle err
-		}
-		fmt.Println(home)
 		outputFolder = filepath.Join(home, outputFolder[2:])
+	} else if strings.HasPrefix(outputFolder, "~"+endhome) && len(endhome) > 0 {
+		outputFolder = filepath.Join(home, outputFolder[len(endhome)+1:])
+	} else if strings.HasPrefix(outputFolder, "~") {
+		outputFolder = filepath.Join(outputFolder[1:])
 	}
 	os.MkdirAll(outputFolder, os.ModePerm)
 	abs, _ := filepath.Abs(outputFolder)
