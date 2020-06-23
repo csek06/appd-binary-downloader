@@ -7,8 +7,10 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
+	homedir "github.com/mitchellh/go-homedir"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -26,6 +28,15 @@ type WriteCounter struct {
 CheckCreateFolder Given a destination automatically create a folder if it doesn't exist and return path of that folder
 */
 func CheckCreateFolder(outputFolder string) string {
+	if strings.HasPrefix(outputFolder, "~/") {
+
+		home, err := homedir.Dir()
+		if err != nil {
+			// handle err
+		}
+		fmt.Println(home)
+		outputFolder = filepath.Join(home, outputFolder[2:])
+	}
 	os.MkdirAll(outputFolder, os.ModePerm)
 	abs, _ := filepath.Abs(outputFolder)
 	return abs + string(os.PathSeparator)
