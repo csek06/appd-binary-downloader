@@ -6,7 +6,7 @@
     * You can use curl from cmd line via below example note the _mac extension for appropriate binary
 
     ```bash
-    curl -Lk https://github.com/csek06/appd-binary-downloader/raw/master/cmd/appd-downloader/appd-downloader_mac -o appd-downloader_mac && chmod +x appd-downloader_mac
+    curl -Lk https://github.com/csek06/appd-binary-downloader/raw/master/cmd/appd-downloader/appd-downloader_mac -o appd-downloader_mac && chmod +x appd-downloader*
     ```
 
 2. Ensure that the binary is executable (linux/unix cmd below)
