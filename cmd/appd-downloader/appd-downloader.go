@@ -193,7 +193,6 @@ func main() {
 		encryptedPassword = privlib.PasswordCreator(decryptedPassword)
 		fmt.Println("Going forward you can pass your encrypted password via CLI as \n-encrypted-password='" + encryptedPassword + "'")
 	}
-	//fmt.Printf("user: %v pass: %v\n", userName, decryptedPassword)
 	if createPassword {
 		promptForPassword()
 	}
@@ -221,10 +220,6 @@ func main() {
 		fmt.Println("Downloading: " + filename)
 		binaryDownload(filename, directBinary)
 	}
-
-	//test jvm sun download
-	//binaryDownload("agent.zip", "download-file/sun-jvm/20.4.0.29862/AppServerAgent-20.4.0.29862.zip")
-
 }
 
 func gatherHostDetails() {
@@ -265,7 +260,6 @@ func promptForPassword() {
 }
 
 func authenticateWithAppDynamics() {
-	//fmt.Println("Authenticating with AppDynamics for [ " + userName + " ] with password: [ " + decryptedPassword + " ]")
 	fmt.Println("Fetching OAUTH Token from AppDynamics")
 	url := "https://identity.msrv.saas.appdynamics.com/v2.0/oauth/token"
 
@@ -286,7 +280,6 @@ func authenticateWithAppDynamics() {
 	count := 0
 	reqbod := ""
 	for scanner.Scan() {
-		//fmt.Println(scanner.Text())
 		count++
 		reqbod += scanner.Text()
 	}
@@ -301,7 +294,6 @@ func authenticateWithAppDynamics() {
 		fmt.Println("ERROR: Could not get token from AppDynamics!")
 	}
 
-	//fmt.Printf("Token:'%v'\n", appdToken)
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}

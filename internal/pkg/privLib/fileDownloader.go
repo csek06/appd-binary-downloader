@@ -60,7 +60,7 @@ func FileDownload(filename, url, token string) {
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
-	resp, err := http.Get("http://google.com")
+	resp, err := http.Get("")
 	if len(token) == 0 {
 		resp, err = http.Get(url)
 	} else {
@@ -77,7 +77,6 @@ func FileDownload(filename, url, token string) {
 		}
 	}
 	// Get the data
-	//resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
