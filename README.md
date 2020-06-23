@@ -19,7 +19,7 @@
 
 #### Download without Authentication
 
-Currently there exists a method to donwload the agents without authentication, this program will attempt to do this. Below is an example command that you would ues to download the database, java, and machine agents all in one go. You will notice I am also using the '-automate' flag that will take some assumptions on what you're searching for by detecting the host environment. Additionally there is the '-o' flag (optional) will place the binaries in the targeted output folder.
+Currently there exists a method to download the agents without authentication, this program will attempt to do this. Below is an example command that you would use to download the database, java, and machine agents all in one go. You will notice I am also using the '-automate' flag that will take some assumptions on what you're searching for by detecting the host environment. Additionally there is the '-o' flag (optional) will place the binaries in the targeted output folder.
 
 ```bash
 ./appd-downloader_mac -automate -db -java -ma -o='agent-folder'
@@ -74,7 +74,7 @@ You would then execute the below command to download a java agent, notice I am n
 
 #### Authentication Flags
 
-- "username" "AppDynamics Community  Username"
+- "username" "AppDynamics Community Username (email)"
 - "encrypted-password" "Your Encrypted Password created by this Program via -create-password"
 - "decrypted-password" "Your AppDynamics Community Password to be Encrypted"
 - "create-password" "Flag to create an Encrypted Password to be used for this program"
