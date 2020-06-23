@@ -115,6 +115,9 @@ The below flags will assist with increased automation to reduce/remove any extra
 - "detect-host" "Flag to detect Host OS / Arch and reduce binary search results"
 - "direct-binary" "Flag to download a binary directly via link produced from previous output"
 - "automate" "Flag to make assumptions based upon best practice installations (e.g. only show RPM if available)"
+- "tos" "Flag to set the target OS binary type (e.g. -tos=linux)"
+- "tbit" "Flag to set the target OS Bit binary type (e.g. -tbit=32)"
+- "extension" "Flag to set file extension zip or rpm or other applicable"
 
 #### Other Helpful Flags
 
