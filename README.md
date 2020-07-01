@@ -136,6 +136,7 @@ The below flags will assist with increased automation to reduce/remove any extra
 #### Other Helpful Flags
 
 - "o" "Flag to set the output folder of binaries, default is current directory"
+- "debug" "Flag to enable debug logging"
 
 ## how to run on mac (open app from an unidentified developer)
 
