@@ -692,8 +692,8 @@ func automateReduceResults(thisStruct *agentSearch) {
 
 	binaries := []agent{}
 	for i := 0; i < len(thisStruct.Results); i++ {
-		// only show rpm if found
-		if thisStruct.Results[i].Extension == "rpm" {
+		// only show rpm or msi if found
+		if thisStruct.Results[i].Extension == "rpm" || thisStruct.Results[i].Extension == "msi" {
 			binaries = append(binaries, thisStruct.Results[i])
 		}
 	}
@@ -704,7 +704,7 @@ func automateReduceResults(thisStruct *agentSearch) {
 	binaries = []agent{}
 	for i := 0; i < len(thisStruct.Results); i++ {
 		// only show appropriate java binaries
-		if hostos == "linux" || hostos == "darwin" && strings.Contains(thisStruct.Results[i].Title, "Sun and JRockit JVM") {
+		if hostos == "linux" || hostos == "darwin" || hostos == "windows" && strings.Contains(thisStruct.Results[i].Title, "Sun and JRockit JVM") {
 			binaries = append(binaries, thisStruct.Results[i])
 		} else if hostos == "aix" && strings.Contains(thisStruct.Results[i].Title, "IBM JVM") {
 			binaries = append(binaries, thisStruct.Results[i])
