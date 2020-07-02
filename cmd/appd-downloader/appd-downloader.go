@@ -633,6 +633,7 @@ func detectHostReduceResults(thisStruct *agentSearch) {
 	if strings.Contains(hostarch, "64") {
 		bit = "64"
 	}
+	// detect bitness
 	binaries := []agent{}
 	for i := 0; i < len(thisStruct.Results); i++ {
 		if thisStruct.Results[i].Bit == bit || thisStruct.Results[i].Bit == "null" || thisStruct.Results[i].Bit == "" {
@@ -643,7 +644,20 @@ func detectHostReduceResults(thisStruct *agentSearch) {
 		thisStruct.Results = binaries
 	}
 	if debugvar {
-		fmt.Println("[DEBUG] Detect Host Reduce Results: " + strconv.Itoa(len(thisStruct.Results)))
+		fmt.Println("[DEBUG] Detect Bit Reduce Results: " + strconv.Itoa(len(thisStruct.Results)))
+	}
+	// detect os
+	binaries = []agent{}
+	for i := 0; i < len(thisStruct.Results); i++ {
+		if strings.Contains(thisStruct.Results[i].Title, hostos) {
+			binaries = append(binaries, thisStruct.Results[i])
+		}
+	}
+	if len(binaries) > 0 {
+		thisStruct.Results = binaries
+	}
+	if debugvar {
+		fmt.Println("[DEBUG] Detect Host OS Reduce Results: " + strconv.Itoa(len(thisStruct.Results)))
 	}
 }
 
