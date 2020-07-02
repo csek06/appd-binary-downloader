@@ -556,15 +556,9 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 			fmt.Printf("[DEBUG] %d: id: %d version: %s title: %s (%s)\n", i, binaries.ID, binaries.Version, binaries.Title, binaries.CreationTime)
 		}
 	}
-
 	// reduce results if extension set
 	if len(extension) > 0 {
 		extensionReduceResults(&searchresults)
-	}
-
-	// reduce results if detecting hosts
-	if detectHost {
-		detectHostReduceResults(&searchresults)
 	}
 
 	// reduce results if targetting OS
@@ -580,6 +574,11 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 	// reduce results if automating
 	if automate {
 		automateReduceResults(&searchresults)
+	}
+
+	// reduce results if detecting hosts
+	if detectHost {
+		detectHostReduceResults(&searchresults)
 	}
 
 	if len(searchresults.Results) == 1 {
