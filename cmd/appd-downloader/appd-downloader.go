@@ -545,25 +545,17 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 		panic(err)
 	}
 
-	//fmt.Println("Response Status:", resp.Status)
-
-	// print response body
-	if debugvar {
-		scanner := bufio.NewScanner(resp.Body)
-		for scanner.Scan() {
-			fmt.Println(scanner.Text())
-		}
-
-		if err := scanner.Err(); err != nil {
-			panic(err)
-		}
-	}
-
 	defer resp.Body.Close()
 
 	// parse JSON response to our AgentSearch Struct
 	var searchresults agentSearch
 	privlib.ParseJSON(resp.Body, &searchresults)
+
+	if debugvar {
+		for i, binaries := range searchresults.Results {
+			fmt.Printf("[DEBUG] %d: id: %d version: %s title: %s (%s)\n", i, binaries.ID, binaries.Version, binaries.Title, binaries.CreationTime)
+		}
+	}
 
 	// reduce results if extension set
 	if len(extension) > 0 {
@@ -632,7 +624,7 @@ func extensionReduceResults(thisStruct *agentSearch) {
 		thisStruct.Results = binaries
 	}
 	if debugvar {
-		fmt.Println("Extension Reduce Results: " + string(len(thisStruct.Results)))
+		fmt.Println("[DEBUG] Extension Reduce Results: " + string(len(thisStruct.Results)))
 	}
 }
 
@@ -651,7 +643,7 @@ func detectHostReduceResults(thisStruct *agentSearch) {
 		thisStruct.Results = binaries
 	}
 	if debugvar {
-		fmt.Println("Detect Host Reduce Results: " + string(len(thisStruct.Results)))
+		fmt.Println("[DEBUG] Detect Host Reduce Results: " + string(len(thisStruct.Results)))
 	}
 }
 
@@ -666,7 +658,7 @@ func targetOSReduceResults(thisStruct *agentSearch) {
 		thisStruct.Results = binaries
 	}
 	if debugvar {
-		fmt.Println("Target OS Reduce Results: " + string(len(thisStruct.Results)))
+		fmt.Println("[DEBUG] Target OS Reduce Results: " + string(len(thisStruct.Results)))
 	}
 }
 
@@ -681,7 +673,7 @@ func targetBitReduceResults(thisStruct *agentSearch) {
 		thisStruct.Results = binaries
 	}
 	if debugvar {
-		fmt.Println("Target Bit Reduce Results: " + string(len(thisStruct.Results)))
+		fmt.Println("[DEBUG] Target Bit Reduce Results: " + string(len(thisStruct.Results)))
 	}
 }
 
@@ -705,7 +697,7 @@ func automateReduceResults(thisStruct *agentSearch) {
 		thisStruct.Results = newbinaries
 	}
 	if debugvar {
-		fmt.Println("Automate Date Reduce Results: " + string(len(thisStruct.Results)))
+		fmt.Println("[DEBUG] Automate Date Reduce Results: " + string(len(thisStruct.Results)))
 	}
 
 	binaries := []agent{}
@@ -719,7 +711,7 @@ func automateReduceResults(thisStruct *agentSearch) {
 		thisStruct.Results = binaries
 	}
 	if debugvar {
-		fmt.Println("Automate Extension (rpm or msi) Reduce Results: " + string(len(thisStruct.Results)))
+		fmt.Println("[DEBUG] Automate Extension (rpm or msi) Reduce Results: " + string(len(thisStruct.Results)))
 	}
 
 	binaries = []agent{}
@@ -735,7 +727,7 @@ func automateReduceResults(thisStruct *agentSearch) {
 		thisStruct.Results = binaries
 	}
 	if debugvar {
-		fmt.Println("Final Automate Reduce Results: " + string(len(thisStruct.Results)))
+		fmt.Println("[DEBUG] Final Automate Reduce Results: " + string(len(thisStruct.Results)))
 	}
 }
 
