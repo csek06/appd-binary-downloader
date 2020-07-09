@@ -51,9 +51,10 @@ var (
 	appdToken         string
 	auth              string
 	// automation assistance
-	detectHost   bool
-	directBinary string
-	automate     bool
+	detectHost    bool
+	directBinary  string
+	automate      bool
+	binaryVersion string
 	// host architecture
 	hostos    string
 	hostarch  string
@@ -145,6 +146,7 @@ func main() {
 	flag.StringVar(&targetos, "tos", "", "Flag to set the target OS binary type (e.g. -tos=linux)")
 	flag.StringVar(&targetbit, "tbit", "", "Flag to set the target OS Bit binary type (e.g. -tbit=32)")
 	flag.StringVar(&extension, "extension", "", "Flag to set file extension zip or rpm or other applicable")
+	flag.StringVar(&binaryVersion, "version", "", "Flag to set the version of the binary to download")
 
 	// other flags
 	flag.StringVar(&outputFolder, "o", "", "Flag to set the output folder of binaries, default is current directory")
@@ -388,6 +390,8 @@ func printCommandLineFlags() {
 func downloadBinaries() {
 	var ver, apm, oss, platOS, cm, event, eum string
 
+	ver = binaryVersion
+
 	// platform components
 	if enterpriseconsole {
 		search := detectPlatformBinary("linux%2Cosx%2Cwindows")
@@ -555,6 +559,7 @@ func binarySearch(ver, apm, oss, platOS, cm, event, eum string) {
 		for i, binaries := range searchresults.Results {
 			fmt.Printf("[DEBUG] %d: id: %d version: %s title: %s (%s)\n", i, binaries.ID, binaries.Version, binaries.Title, binaries.CreationTime)
 		}
+		fmt.Println("[DEBUG] Initial Count of Search Results: " + strconv.Itoa(searchresults.Count))
 	}
 	// reduce results if extension set
 	if len(extension) > 0 {
@@ -730,7 +735,7 @@ func automateReduceResults(thisStruct *agentSearch) {
 	binaries = []agent{}
 	for i := 0; i < len(thisStruct.Results); i++ {
 		// only show appropriate java binaries
-		if hostos == "linux" || hostos == "darwin" || hostos == "windows" && strings.Contains(thisStruct.Results[i].Title, "Sun and JRockit JVM") {
+		if (hostos == "linux" || hostos == "darwin" || hostos == "windows") && strings.Contains(thisStruct.Results[i].Title, "Sun and JRockit JVM") {
 			binaries = append(binaries, thisStruct.Results[i])
 		} else if hostos == "aix" && strings.Contains(thisStruct.Results[i].Title, "IBM JVM") {
 			binaries = append(binaries, thisStruct.Results[i])
