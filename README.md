@@ -132,6 +132,7 @@ The below flags will assist with increased automation to reduce/remove any extra
 - "tos" "Flag to set the target OS binary type (e.g. -tos=linux)"
 - "tbit" "Flag to set the target OS Bit binary type (e.g. -tbit=32)"
 - "extension" "Flag to set file extension zip or rpm or other applicable"
+- "version" "Flag to set the version of the binary to download"
 
 #### Other Helpful Flags
 
