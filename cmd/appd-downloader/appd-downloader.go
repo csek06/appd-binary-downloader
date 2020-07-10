@@ -64,6 +64,7 @@ var (
 	// other flags
 	outputFolder string
 	debugvar     bool
+	getVersions  bool
 )
 
 type agent struct {
@@ -100,6 +101,15 @@ type agentSearch struct {
 	Next     string  `json:"next"`
 	Previous string  `json:"previous"`
 	Results  []agent `json:"results"`
+}
+
+type versionList struct {
+	VLversion       string `json:"version"`
+	VLcreationTime  string `json:"creation_time"`
+	VLmajorVersion  int    `json:"major_version"`
+	VLminorVersion  int    `json:"minor_version"`
+	VLhotfixVersion int    `json:"hotfix_version"`
+	VLbuildNumber   int    `json:"build_number"`
 }
 
 func main() {
@@ -151,8 +161,13 @@ func main() {
 	// other flags
 	flag.StringVar(&outputFolder, "o", "", "Flag to set the output folder of binaries, default is current directory")
 	flag.BoolVar(&debugvar, "debug", false, "Flag to enable debug logging")
+	flag.BoolVar(&getVersions, "list-versions", false, "Flag to list the current supported major versions of aggregate binaries (not just for a single binary type e.g. Java)")
 
 	flag.Parse()
+
+	if getVersions {
+		getVersionList()
+	}
 
 	if automate {
 		detectHost = true
@@ -223,6 +238,28 @@ func main() {
 		filename := splits[len(splits)-1]
 		fmt.Println("Downloading: " + filename)
 		binaryDownload(filename, directBinary)
+	}
+}
+
+func getVersionList() {
+	url := "https://download.appdynamics.com/download/version/?version-degree=2"
+
+	var myClient = &http.Client{Timeout: 10 * time.Second}
+
+	resp, err := myClient.Get(url)
+	if err != nil {
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+
+	// parse JSON response to our versionList Struct
+	var versionresults []versionList
+	privlib.ParseJSON(resp.Body, &versionresults)
+
+	fmt.Println("Current List of Supported Major Versions from All Binary Types...")
+	for i := 0; i < len(versionresults); i++ {
+		fmt.Printf("\t%s available version: %s\tcreation date: %s\n", strconv.Itoa(i), versionresults[i].VLversion, versionresults[i].VLcreationTime)
 	}
 }
 
@@ -312,7 +349,9 @@ func anythingToDownload() bool {
 		return true
 	}
 	fmt.Println("Nothing set to download via CLI")
-	flag.PrintDefaults()
+	if !getVersions {
+		flag.PrintDefaults()
+	}
 	return false
 
 }
