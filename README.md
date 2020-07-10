@@ -138,6 +138,7 @@ The below flags will assist with increased automation to reduce/remove any extra
 
 - "o" "Flag to set the output folder of binaries, default is current directory"
 - "debug" "Flag to enable debug logging"
+- "list-versions" "Flag to list the current supported major versions of aggregate binaries (not just for a single binary type e.g. Java)"
 
 ## how to run on mac (open app from an unidentified developer)
 
